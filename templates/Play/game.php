@@ -1,11 +1,29 @@
-<?php
-    echo "Quantidade total de espaços: ". $spaces;
-    echo "<br><br>Todos os prêmios: <br>";
-    print_r($awards);
+<?php use Cake\Routing\Router; ?>
 
-    $awards = json_decode($awards);
-    
-    echo "<br><br>Casa selecionada: ". $selected;
-    echo "<br>Prêmio posição: ".$award."<br>";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $.ajax({
+        url: "<?php echo Router::url(array('controller' => 'Play', 'action' => 'getAwards')) ?>",
+        method: "GET",
+        dataType: 'json',
+        success: function(data) {
+            console.log('PRÊMIOS: ', data);
 
-?>
+        },
+        error: function(error) {
+            console.log('ERRO: ', error.responseText)
+        }
+    })
+    $.ajax({
+        url: "<?php echo Router::url(array('controller' => 'Play', 'action' => 'getAward')) ?>",
+        method: "GET",
+        dataType: 'json',
+        success: function(data) {
+            console.log('SORTEADO: ', data)
+
+        },
+        error: function(error) {
+            console.log('ERRO: ', error.responseText)
+        }
+    })
+</script>
