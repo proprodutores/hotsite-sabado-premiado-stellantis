@@ -147,7 +147,7 @@ class PlayController extends AppController
             return $this->response->withStringBody(json_encode($awards));
         }
 
-        return null;
+        return $this->response->withStringBody("");
     }
 
     public function getAward()
@@ -170,7 +170,7 @@ class PlayController extends AppController
             return $this->response->withStringBody(json_encode($award));
         }
 
-        return null;
+        return $this->response->withStringBody("");
     }
 
     public function registerAward()
