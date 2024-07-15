@@ -27,7 +27,10 @@ use Cake\Routing\Router; ?>
             success: function(data) {
                 console.log('SORTEADO: ', data);
                 
-                // ATENÇÃO: o segundo parâmetro aqui tem que ser o ID do premio
+                // ATENÇÃO: 
+                // Só podemos mostrar o resultado na tela após receber o OK do registerAward
+                // Pois, se duas pessoas acertarem ao mesmo tempo, somente a que deu register primeiro poderá ver que ganhou
+                // O segundo parâmetro aqui tem que ser o ID do prêmio
                 registerAward(1, data);
 
             },
