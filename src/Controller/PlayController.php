@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -110,26 +111,64 @@ class PlayController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function game(){
+    public function game()
+    {
         $now = date('Y-m-d H:i:s');
 
         $sweepstake = $this->fetchTable('Sweepstakes')->find()->where(['date_start <= ' => $now, 'date_end >= ' => $now, 'active' => true])->first();
-        if($sweepstake){
+        if ($sweepstake) {
             $spaces = $sweepstake->spaces;
             $awards = $this->fetchTable('Awards')->find()->select(['name', 'spaces', 'balance', 'image'])->where(['sweepstake_id' => $sweepstake->id])->order(['id'])->toList();
-            
+
             $awards_balance = $this->fetchTable('Awards')->find()->select(['name', 'spaces', 'image'])->where(['sweepstake_id' => $sweepstake->id, 'balance >' => 0])->order(['id'])->toList();
-            
+
             $award = null;
             $selected = rand(1, $spaces);
-            if($selected <= count($awards_balance)){
-                $award = $selected-1;
+            if ($selected <= count($awards_balance)) {
+                $award = $selected - 1;
             }
-            
+
             $awards = json_encode($awards);
-            
+
             $this->set(compact('spaces', 'awards', 'selected', 'award'));
         }
+    }
 
+    public function getAwards()
+    {
+        $now = date('Y-m-d H:i:s');
+
+        $awards = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
+            ->select(['Sweepstakes.spaces', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true])->order(['Awards.id'])->toList();
+
+        if ($awards) {
+            return $this->response->withStringBody(json_encode($awards));
+        }
+
+        return null;
+    }
+
+    public function getAward()
+    {
+        $now = date('Y-m-d H:i:s');
+
+        $awards_balance = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
+            ->select(['Sweepstakes.spaces', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])->order(['Awards.id'])->toList();
+
+        if ($awards_balance) {
+            $spaces = $awards_balance[0]->sweepstake->spaces;
+
+            $award = null;
+            $selected = rand(1, $spaces);
+            if ($selected <= count($awards_balance)) {
+                $award = $selected - 1;
+            }
+
+            return $this->response->withStringBody(json_encode($award));
+        }
+
+        return null;
     }
 }
