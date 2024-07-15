@@ -12,6 +12,7 @@ namespace App\Controller;
  */
 class PlayController extends AppController
 {
+
     /**
      * Index method
      *
@@ -139,7 +140,7 @@ class PlayController extends AppController
         $now = date('Y-m-d H:i:s');
 
         $awards = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
             ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true])->order(['Awards.id'])->toList();
 
         if ($awards) {
@@ -154,7 +155,7 @@ class PlayController extends AppController
         $now = date('Y-m-d H:i:s');
 
         $awards_balance = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
             ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])->order(['Awards.id'])->toList();
 
         if ($awards_balance) {
@@ -170,5 +171,45 @@ class PlayController extends AppController
         }
 
         return null;
+    }
+
+    public function registerAward()
+    {
+        if ($this->request->is('post')) {
+            $user_id = $this->request->getData('user_id');
+            $award_id = $this->request->getData('award_id');
+
+            if ($award_id == null) {
+                $play = $this->Play->newEmptyEntity();
+                $play->user_id = $user_id;
+
+                if ($this->Play->save($play)) {
+                    return $this->response->withStringBody("OK");
+                } else {
+                    return $this->response->withStringBody("");
+                }
+            } else {
+                $award = $this->fetchTable('Awards')->find()->where(['id' => $award_id])->first();
+
+                if ($award && $award->balance > 0) {
+                    $award->balance--;
+                    if ($this->fetchTable('Awards')->save($award)) {
+                        $play = $this->Play->newEmptyEntity();
+                        $play->user_id = $user_id;
+                        $play->award_id = $award_id;
+
+                        if ($this->Play->save($play)) {
+                            return $this->response->withStringBody("OK");
+                        } else {
+                            return $this->response->withStringBody("");
+                        }
+                    }
+                } else {
+                    return $this->response->withStringBody("");
+                }
+            }
+        } else {
+            return $this->response->withStringBody("");
+        }
     }
 }
