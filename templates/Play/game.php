@@ -36,6 +36,7 @@ use Cake\Routing\Router; ?>
             },
             error: function(error) {
                 console.log('ERRO: ', error.responseText);
+                registerAward(1, null);
             }
         })
     }

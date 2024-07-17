@@ -156,15 +156,16 @@ class PlayController extends AppController
 
         $awards_balance = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
             ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
-            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])->order(['Awards.id'])->toList();
+            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])
+            ->order(['Awards.id'])->toList();
 
         if ($awards_balance) {
             $spaces = $awards_balance[0]->sweepstake->spaces;
 
             $award = null;
-            $selected = rand(1, $spaces);
+            $selected = rand(1, ($spaces * 2));
             if ($selected <= count($awards_balance)) {
-                $award = $selected - 1;
+                $award = $awards_balance[$selected - 1]->id;
             }
 
             return $this->response->withStringBody(json_encode($award));
