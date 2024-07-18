@@ -54,6 +54,7 @@ return function (RouteBuilder $routes): void {
 
         $builder->get('/play/getAwards', ['controller' => 'Play', 'action' => 'getAwards', 'prefix' => 'Api']);
         $builder->get('/play/getAward', ['controller' => 'Play', 'action' => 'getAward', 'prefix' => 'Api']);
+        $builder->post('/play/registerAward', ['controller' => 'Play', 'action' => 'registerAward', 'prefix' => 'Api']);
 
         $builder->post('/users/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'Api']);
         $builder->post('/users/logout', ['controller' => 'Users', 'action' => 'logout', 'prefix' => 'Api']);
