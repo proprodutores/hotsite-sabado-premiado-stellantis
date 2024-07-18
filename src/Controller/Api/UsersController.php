@@ -22,7 +22,7 @@ class UsersController extends AppController
             $payload = [
                 'iss' => 'hotsite_sabado_premiado_stellantis',
                 'sub' => $user->id,
-                'exp' => time() + 60,
+                'exp' => time() + 14400,
             ];
             $userData = [
                 'id' => $user->id,
