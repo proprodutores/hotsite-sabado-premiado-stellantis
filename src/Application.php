@@ -72,8 +72,6 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
         if (Configure::read('debug')) {
             $this->addPlugin('DebugKit');
         }
-
-        // Load more plugins here
     }
 
     /**
@@ -84,6 +82,14 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
+        $csfr = new CsrfProtectionMiddleware();
+
+        $csfr->skipCheckCallback(function ($request) {
+            if ($request->getParam('prefix') === 'Api') {
+                return true;
+            }
+        });
+
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
@@ -105,11 +111,8 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             // https://book.cakephp.org/4/en/controllers/middleware.html#body-parser-middleware
             ->add(new BodyParserMiddleware())
 
-            // Cross Site Request Forgery (CSRF) Protection Middleware
-            // https://book.cakephp.org/4/en/security/csrf.html#cross-site-request-forgery-csrf-middleware
-            ->add(new CsrfProtectionMiddleware([
-                'httponly' => true,
-            ]))
+            // Add Csrf middleware
+            ->add($csfr)
 
             // Add the AuthenticationMiddleware. It should be
             // after routing and body parser.
@@ -149,9 +152,11 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
     {
         $service = new AuthenticationService();
 
+        $isApiRequest = str_starts_with($request->getRequestTarget(), '/api');
+
         // Define where users should be redirected to when they are not authenticated
         $service->setConfig([
-            'unauthenticatedRedirect' => Router::url([
+            'unauthenticatedRedirect' => $isApiRequest ? null : Router::url([
                 'prefix' => false,
                 'plugin' => null,
                 'controller' => 'Users',
@@ -164,20 +169,32 @@ class Application extends BaseApplication implements AuthenticationServiceProvid
             IdentifierInterface::CREDENTIAL_USERNAME => 'login',
             IdentifierInterface::CREDENTIAL_PASSWORD => 'password'
         ];
-        // Load the authenticators. Session should be first.
-        $service->loadAuthenticator('Authentication.Session');
-        $service->loadAuthenticator('Authentication.Form', [
-            'fields' => $fields,
-            'loginUrl' => Router::url([
-                'prefix' => false,
-                'plugin' => null,
-                'controller' => 'Users',
-                'action' => 'login',
-            ]),
-        ]);
 
         // Load identifiers
         $service->loadIdentifier('Authentication.Password', compact('fields'));
+
+        $service->loadAuthenticator('Authentication.Form', [
+            'fields' => $fields,
+            // 'loginUrl' => Router::url([
+            //     'prefix' => false,
+            //     'plugin' => null,
+            //     'controller' => 'Users',
+            //     'action' => 'login',
+            // ]),
+        ]);
+
+        // Load the authenticators. Session should be first.
+        if($isApiRequest) {
+            $service->loadIdentifier('Authentication.JwtSubject');
+            $service->loadAuthenticator('Authentication.Jwt', [
+                'secretKey' => file_get_contents(CONFIG . '/jwt.pem'),
+                'algorithm' => 'RS256',
+                'returnPayload' => false
+            ]);
+        } else {
+            $service->loadAuthenticator('Authentication.Session');
+        }
+
 
         return $service;
     }

@@ -49,6 +49,16 @@ return function (RouteBuilder $routes): void {
      */
     $routes->setRouteClass(DashedRoute::class);
 
+    $routes->scope('/api', function (RouteBuilder $builder) {
+        $builder->setExtensions(['json']);
+
+        $builder->get('/play/getAwards', ['controller' => 'Play', 'action' => 'getAwards', 'prefix' => 'Api']);
+        $builder->get('/play/getAward', ['controller' => 'Play', 'action' => 'getAward', 'prefix' => 'Api']);
+
+        $builder->post('/users/login', ['controller' => 'Users', 'action' => 'login', 'prefix' => 'Api']);
+        $builder->post('/users/logout', ['controller' => 'Users', 'action' => 'logout', 'prefix' => 'Api']);
+    });
+
     $routes->scope('/', function (RouteBuilder $builder): void {
         /*
          * Here, we are connecting '/' (base path) to a controller called 'Pages',

@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Controller\Api;
+
+use Cake\View\JsonView;
 
 /**
  * Play Controller
@@ -12,7 +14,6 @@ namespace App\Controller;
  */
 class PlayController extends AppController
 {
-
     /**
      * Index method
      *
@@ -139,16 +140,22 @@ class PlayController extends AppController
     {
         $now = date('Y-m-d H:i:s');
 
-        $awards = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
+        $awards = $this->fetchTable('Awards')->find()
+            ->contain(['Sweepstakes'])
             ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
-            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true])->order(['Awards.id'])->toList();
+            ->where([
+                'Sweepstakes.date_start <=' => $now,
+                'Sweepstakes.date_end >=' => $now,
+                'Sweepstakes.active' => true
+            ])
+            ->order(['Awards.id'])
+            ->toList();
 
         if ($awards) {
             return $this->response->withStringBody(json_encode($awards));
         }
 
-        $this->set(compact('awards'));
-        return $this->response->withStringBody("");
+        return $this->response->withStringBody(json_encode($awards));
     }
 
     public function getAward()
