@@ -193,9 +193,9 @@ class PlayController extends AppController
                 $play->user_id = $user_id;
 
                 if ($this->Play->save($play)) {
-                    return $this->response->withStringBody("OK");
+                    return $this->response->withStringBody('-1');
                 } else {
-                    return $this->response->withStringBody("");
+                    return $this->response->withStringBody('-1');
                 }
             } else {
                 $award = $this->fetchTable('Awards')->find()->where(['id' => $award_id])->first();
@@ -208,17 +208,17 @@ class PlayController extends AppController
                         $play->award_id = $award_id;
 
                         if ($this->Play->save($play)) {
-                            return $this->response->withStringBody("OK");
+                            return $this->response->withStringBody("1");
                         } else {
-                            return $this->response->withStringBody("");
+                            return $this->response->withStringBody("-1");
                         }
                     }
                 } else {
-                    return $this->response->withStringBody("");
+                    return $this->response->withStringBody("-1");
                 }
             }
         } else {
-            return $this->response->withStringBody("");
+            return $this->response->withStringBody("-1");
         }
     }
 }
