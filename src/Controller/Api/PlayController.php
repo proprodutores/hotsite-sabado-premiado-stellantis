@@ -142,7 +142,7 @@ class PlayController extends AppController
 
         $awards = $this->fetchTable('Awards')->find()
             ->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.description', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
             ->where([
                 'Sweepstakes.date_start <=' => $now,
                 'Sweepstakes.date_end >=' => $now,
@@ -163,7 +163,7 @@ class PlayController extends AppController
         $now = date('Y-m-d H:i:s');
 
         $awards_balance = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.description', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
             ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])
             ->order(['Awards.id'])->toList();
 
