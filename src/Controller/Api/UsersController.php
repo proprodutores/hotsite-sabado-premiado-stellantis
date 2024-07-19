@@ -35,7 +35,7 @@ class UsersController extends AppController
                 'user' => $userData,
             ];
         } else {
-            $this->response = $this->response->withStatus(401); // Unauthorized
+            $this->response = $this->response->withStatus(200); // Unauthorized
             $json = [
                 'success' => false,
                 'message' => 'Invalid username or password',
