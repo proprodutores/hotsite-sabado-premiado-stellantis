@@ -50,11 +50,11 @@ class SweepstakesController extends AppController
         if ($this->request->is('post')) {
             $sweepstake = $this->Sweepstakes->patchEntity($sweepstake, $this->request->getData());
             if ($this->Sweepstakes->save($sweepstake)) {
-                $this->Flash->success(__('The sweepstake has been saved.'));
+                $this->Flash->success(__('Sorteio salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The sweepstake could not be saved. Please, try again.'));
+            $this->Flash->error(__('Falha ao salvar sorteio. Por favor, tente novamente.'));
         }
         $this->set(compact('sweepstake'));
     }
@@ -74,11 +74,11 @@ class SweepstakesController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $sweepstake = $this->Sweepstakes->patchEntity($sweepstake, $this->request->getData());
             if ($this->Sweepstakes->save($sweepstake)) {
-                $this->Flash->success(__('The sweepstake has been saved.'));
+                $this->Flash->success(__('Sorteio salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The sweepstake could not be saved. Please, try again.'));
+            $this->Flash->error(__('Falha ao salvar sorteio. Por favor, tente novamente.'));
         }
         $this->set(compact('sweepstake'));
     }
@@ -95,9 +95,9 @@ class SweepstakesController extends AppController
         $this->request->allowMethod(['post', 'delete']);
         $sweepstake = $this->Sweepstakes->get($id);
         if ($this->Sweepstakes->delete($sweepstake)) {
-            $this->Flash->success(__('The sweepstake has been deleted.'));
+            $this->Flash->success(__('Sorteio removido.'));
         } else {
-            $this->Flash->error(__('The sweepstake could not be deleted. Please, try again.'));
+            $this->Flash->error(__('Falha ao remover sorteio. Por favor, tente novamente.'));
         }
 
         return $this->redirect(['action' => 'index']);

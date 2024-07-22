@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\View\JsonView;
+
 /**
  * Play Controller
  *
@@ -12,7 +14,6 @@ namespace App\Controller;
  */
 class PlayController extends AppController
 {
-
     /**
      * Index method
      *
@@ -139,16 +140,22 @@ class PlayController extends AppController
     {
         $now = date('Y-m-d H:i:s');
 
-        $awards = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
-            ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true])->order(['Awards.id'])->toList();
+        $awards = $this->fetchTable('Awards')->find()
+            ->contain(['Sweepstakes'])
+            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.description', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->where([
+                'Sweepstakes.date_start <=' => $now,
+                'Sweepstakes.date_end >=' => $now,
+                'Sweepstakes.active' => true
+            ])
+            ->order(['Awards.id'])
+            ->toList();
 
         if ($awards) {
             return $this->response->withStringBody(json_encode($awards));
         }
 
-        $this->set(compact('awards'));
-        return $this->response->withStringBody("");
+        return $this->response->withStringBody(json_encode($awards));
     }
 
     public function getAward()
@@ -156,20 +163,30 @@ class PlayController extends AppController
         $now = date('Y-m-d H:i:s');
 
         $awards_balance = $this->fetchTable('Awards')->find()->contain(['Sweepstakes'])
-            ->select(['Sweepstakes.spaces', 'Awards.id', 'Awards.name', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
+            ->select(['Sweepstakes.spaces', 'Sweepstakes.difficulty', 'Awards.id', 'Awards.name', 'Awards.description', 'Awards.spaces', 'Awards.balance', 'Awards.image'])
             ->where(['Sweepstakes.date_start <= ' => $now, 'Sweepstakes.date_end >= ' => $now, 'Sweepstakes.active' => true, 'balance >' => 0])
             ->order(['Awards.id'])->toList();
 
         if ($awards_balance) {
-            $spaces = $awards_balance[0]->sweepstake->spaces;
-
             $award = null;
-            $selected = rand(1, ($spaces * 2));
-            if ($selected <= count($awards_balance)) {
-                $award = $awards_balance[$selected - 1]->id;
-            }
 
-            return $this->response->withStringBody(json_encode($award));
+            $spaces = $awards_balance[0]->sweepstake->spaces;
+            $difficulty = ($awards_balance[0]->sweepstake->difficulty == null) ? 5 : $awards_balance[0]->sweepstake->difficulty;
+            
+            $balance = count($awards_balance);
+            if($balance > 0){
+                $end = (int) ($balance * 100 / $difficulty);
+
+                $selected = rand(1, $end);
+                if ($selected <= $balance) {
+                    $award = $awards_balance[$selected - 1]->id;
+                }
+
+                return $this->response->withStringBody(json_encode($award));
+            }
+            else{
+                return $this->response->withStringBody("");
+            }
         }
 
         return $this->response->withStringBody("");
@@ -186,9 +203,9 @@ class PlayController extends AppController
                 $play->user_id = $user_id;
 
                 if ($this->Play->save($play)) {
-                    return $this->response->withStringBody("OK");
+                    return $this->response->withStringBody('-1');
                 } else {
-                    return $this->response->withStringBody("");
+                    return $this->response->withStringBody('-1');
                 }
             } else {
                 $award = $this->fetchTable('Awards')->find()->where(['id' => $award_id])->first();
@@ -201,17 +218,17 @@ class PlayController extends AppController
                         $play->award_id = $award_id;
 
                         if ($this->Play->save($play)) {
-                            return $this->response->withStringBody("OK");
+                            return $this->response->withStringBody("1");
                         } else {
-                            return $this->response->withStringBody("");
+                            return $this->response->withStringBody("-1");
                         }
                     }
                 } else {
-                    return $this->response->withStringBody("");
+                    return $this->response->withStringBody("-1");
                 }
             }
         } else {
-            return $this->response->withStringBody("");
+            return $this->response->withStringBody("-1");
         }
     }
 }

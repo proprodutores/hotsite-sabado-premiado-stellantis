@@ -1,7 +1,15 @@
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+    }
+    .content {
+        width: 50%;
+    }
+</style>
 <div class="users form content">
     <?= $this->Form->create() ?>
     <fieldset>
-        <legend>Por favor, entre com seu usuário e senha</legend>
         <?= $this->Form->control('login', ['label' => 'Usuário']) ?>
         <?= $this->Form->control('password', ['label' => 'Senha']) ?>
     </fieldset>

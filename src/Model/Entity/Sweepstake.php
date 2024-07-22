@@ -39,5 +39,6 @@ class Sweepstake extends Entity
         'created' => true,
         'modified' => true,
         'awards' => true,
+        'difficulty' => true
     ];
 }

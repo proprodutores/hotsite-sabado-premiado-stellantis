@@ -26,7 +26,7 @@ use Cake\Routing\Router; ?>
             dataType: 'json',
             success: function(data) {
                 console.log('SORTEADO: ', data);
-                
+
                 // ATENÇÃO: 
                 // Só podemos mostrar o resultado na tela após receber o OK do registerAward
                 // Pois, se duas pessoas acertarem ao mesmo tempo, somente a que deu register primeiro poderá ver que ganhou
@@ -35,7 +35,7 @@ use Cake\Routing\Router; ?>
 
             },
             error: function(error) {
-                console.log('ERRO: ', error.responseText);
+                console.log('ERRO GET: ', error.responseText);
                 registerAward(1, null);
             }
         })
@@ -45,7 +45,10 @@ use Cake\Routing\Router; ?>
         $.ajax({
             url: "<?php echo Router::url(array('controller' => 'Play', 'action' => 'registerAward')) ?>",
             method: "POST",
-            data: {user_id: user_id, award_id: award_id},
+            data: {
+                user_id: user_id,
+                award_id: award_id
+            },
             headers: {
                 'X-CSRF-Token': "<?= $this->request->getAttribute('csrfToken'); ?>"
             },
@@ -54,13 +57,17 @@ use Cake\Routing\Router; ?>
 
             },
             error: function(error) {
-                console.log('ERRO: ', error.responseText);
+                console.log('ERRO POST: ', error.responseText);
             }
         })
     }
 
     getAwards();
-    getAward();
+    // getAward();
 
-    
+    for (i = 0; i < 750; i++) {
+        setTimeout(() => {
+            getAward();
+        }, 500);
+    }
 </script>

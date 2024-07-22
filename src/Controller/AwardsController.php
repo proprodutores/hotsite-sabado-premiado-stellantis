@@ -19,7 +19,8 @@ class AwardsController extends AppController
     public function index($sweepstake_id)
     {
         $awards = $this->paginate($this->Awards->find('all')->contain(['Sweepstakes'])->where(['sweepstake_id' => $sweepstake_id]));
-        $this->set(compact('awards', 'sweepstake_id'));
+        $sweepstake = $this->Awards->Sweepstakes->find()->where(['Sweepstakes.id' => $sweepstake_id])->first();
+        $this->set(compact('awards', 'sweepstake_id', 'sweepstake'));
     }
 
     /**
@@ -50,11 +51,11 @@ class AwardsController extends AppController
             $award = $this->Awards->patchEntity($award, $this->request->getData());
             $award->balance = $award->quantity;
             if ($this->Awards->save($award)) {
-                $this->Flash->success(__('The award has been saved.'));
+                $this->Flash->success(__('Prêmio salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index', $sweepstake_id]);
             }
-            $this->Flash->error(__('The award could not be saved. Please, try again.'));
+            $this->Flash->error(__('Falha ao salvar prêmio. Por favor, tente novamente.'));
         }
         $sweepstakes = $this->Awards->Sweepstakes->find('list', ['limit' => 200])->all();
         $this->set(compact('award', 'sweepstakes', 'sweepstake_id'));
@@ -75,11 +76,11 @@ class AwardsController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
             $award = $this->Awards->patchEntity($award, $this->request->getData());
             if ($this->Awards->save($award)) {
-                $this->Flash->success(__('The award has been saved.'));
+                $this->Flash->success(__('Prêmio salvo com sucesso.'));
 
                 return $this->redirect(['action' => 'index', $sweepstake_id]);
             }
-            $this->Flash->error(__('The award could not be saved. Please, try again.'));
+            $this->Flash->error(__('Falha ao salvar prêmio. Por favor, tente novamente.'));
         }
         $sweepstakes = $this->Awards->Sweepstakes->find('list', ['limit' => 200])->all();
         $this->set(compact('award', 'sweepstakes', 'sweepstake_id'));
@@ -92,16 +93,16 @@ class AwardsController extends AppController
      * @return \Cake\Http\Response|null|void Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete($id = null, $sweepstake_id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $award = $this->Awards->get($id);
         if ($this->Awards->delete($award)) {
-            $this->Flash->success(__('The award has been deleted.'));
+            $this->Flash->success(__('prêmio removido.'));
         } else {
-            $this->Flash->error(__('The award could not be deleted. Please, try again.'));
+            $this->Flash->error(__('Falha ao remover prêmio. Por favor, tente novamente.'));
         }
 
-        return $this->redirect(['action' => 'index']);
+        return $this->redirect(['action' => 'index', $sweepstake_id]);
     }
 }

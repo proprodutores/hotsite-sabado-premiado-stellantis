@@ -31,6 +31,10 @@
                     <td><?= h($sweepstake->date_end) ?></td>
                 </tr>
                 <tr>
+                    <th><?= __('Fator de doficuldade') ?></th>
+                    <td><?= h($sweepstake->difficulty) ?></td>
+                </tr>
+                <tr>
                     <th><?= __('Qtde de Espaços') ?></th>
                     <td><?= $sweepstake->spaces === null ? '' : $this->Number->format($sweepstake->spaces) ?></td>
                 </tr>

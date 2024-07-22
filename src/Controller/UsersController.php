@@ -115,7 +115,7 @@ class UsersController extends AppController
         $result = $this->Authentication->getResult();
         // If the user is logged in send them away.
         if ($result->isValid()) {
-            return $this->redirect(['controller' => 'Play', 'action' => 'game']);
+            return $this->redirect(['controller' => 'Sweepstakes', 'action' => 'index']);
         }
         if ($this->request->is('post')) {
             $this->Flash->error('Invalid username or password');

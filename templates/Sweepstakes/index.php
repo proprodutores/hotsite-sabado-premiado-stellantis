@@ -26,7 +26,7 @@
                     <td><?= $sweepstake->description ?></td>
                     <td><?= $sweepstake->date_start->format('d/m/Y H:i') ?></td>
                     <td><?= $sweepstake->date_end->format('d/m/Y H:i') ?></td>
-                    <td><?= $this->Html->link('Ver prêmios', ['controller '=> 'Awards', 'action' => 'index', $sweepstake->id]) ?></td>
+                    <td><?= $this->Html->link('Acessar prêmios', ['action' => 'index', 'controller' => 'Awards', $sweepstake->id]) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('Ver'), ['action' => 'view', $sweepstake->id]) ?>
                         <?= $this->Html->link(__('Editar'), ['action' => 'edit', $sweepstake->id]) ?>
