@@ -43,7 +43,11 @@
             <?php
             $user_logged = $this->request->getAttribute('identity');
             if (isset($user_logged)){
-                echo '<div class="top-nav-links">'.$this->Html->link('ACESSAR SORTEIOS', ['action' => 'index', 'controller' => 'Sweepstakes'], []).'</div>';
+                echo '<div class="top-nav-links">'.$this->Html->link('SORTEIOS', ['action' => 'index', 'controller' => 'Sweepstakes'], []).'</div>';
+                echo '<div> | </div>';
+                echo '<div class="top-nav-links">'.$this->Html->link('GANHADORES', ['action' => 'index', 'controller' => 'Winners'], []).'</div>';
+                echo '<div> | </div>';
+                echo '<div class="top-nav-links">'.$this->Html->link('RELATÓRIO', ['action' => 'index', 'controller' => 'Play'], []).'</div>';
                 echo '<div class="">'.$this->Html->link($user_logged['name'] . ' (sair)', ['action' => 'logout', 'controller' => 'Users'], ['escape' => false, 'class' => 'icon-logout flex-column flex-center ', 'title' => 'SAIR']).'</div>';
             }
             ?>

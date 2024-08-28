@@ -1,52 +1,59 @@
 <?php
+
 /**
  * @var \App\View\AppView $this
  * @var iterable<\App\Model\Entity\Play> $play
  */
 ?>
 <div class="play index content">
-    <?= $this->Html->link(__('New Play'), ['action' => 'add'], ['class' => 'button float-right']) ?>
-    <h3><?= __('Play') ?></h3>
+    <h3>Relatórios de jogadas</h3>
+    <?= $this->Form->create(null, ['role' => 'form', 'method' => 'post', 'class' => 'form-search']) ?>
+        <div class="row">
+            <div class="column"><?= $this->Form->control('sweepstake_id', ['label' => 'Prêmios do sorteio', 'empty' => 'Selecione', 'options' => $sweepstakes]) ?></div>
+            <div class="column"><?= $this->Form->control('user_id', ['label' => 'Local', 'empty' => 'Selecione','options' => $users]) ?></div>
+            <div class="column"><?= $this->Form->control('start_date', ['label' => 'Início', 'type'=> 'datetime']) ?></div>
+            <div class="column"><?= $this->Form->control('end_date', ['label' => 'Fim', 'type'=> 'datetime']) ?></div>
+        </div>
+        <div class="row">
+            <div class="column" style="text-align: right;">
+                <?= $this->Form->submit('Pesquisar', ['id' => 'btn-search', 'class' => 'float-center button']) ?>
+                <?= $this->Html->link(__('Limpar pesquisa'), ['action' => 'index']) ?>
+            </div>
+        </div>
+    <?= $this->Form->end() ?>
+    <br>
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('drawn_position') ?></th>
-                    <th><?= $this->Paginator->sort('award_id') ?></th>
-                    <th><?= $this->Paginator->sort('user_id') ?></th>
-                    <th><?= $this->Paginator->sort('created') ?></th>
-                    <th><?= $this->Paginator->sort('modified') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
+                    <th><?= $this->Paginator->sort('id', ['label' => '#']) ?></th>
+                    <th><?= $this->Paginator->sort('sweepstake_id', ['label' => 'Sorteio']) ?></th>
+                    <th><?= $this->Paginator->sort('award_id', ['label' => 'Prêmio']) ?></th>
+                    <th><?= $this->Paginator->sort('user_id', ['label' => 'Local']) ?></th>
+                    <th><?= $this->Paginator->sort('created', ['label' => 'Registrado em']) ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($play as $play): ?>
-                <tr>
-                    <td><?= $this->Number->format($play->id) ?></td>
-                    <td><?= h($play->drawn_position) ?></td>
-                    <td><?= $play->has('award') ? $this->Html->link($play->award->name, ['controller' => 'Awards', 'action' => 'view', $play->award->id]) : '' ?></td>
-                    <td><?= $play->has('user') ? $this->Html->link($play->user->name, ['controller' => 'Users', 'action' => 'view', $play->user->id]) : '' ?></td>
-                    <td><?= h($play->created) ?></td>
-                    <td><?= h($play->modified) ?></td>
-                    <td class="actions">
-                        <?= $this->Html->link(__('View'), ['action' => 'view', $play->id]) ?>
-                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $play->id]) ?>
-                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $play->id], ['confirm' => __('Are you sure you want to delete # {0}?', $play->id)]) ?>
-                    </td>
-                </tr>
+                    <tr>
+                        <td><?= $this->Number->format($play->id) ?></td>
+                        <td><?= $play->award != null ? $play->award->sweepstake->description : '' ?></td>
+                        <td><?= $play->has('award') ? $this->Html->link($play->award->name, ['controller' => 'Awards', 'action' => 'view', $play->award->id]) : '' ?></td>
+                        <td><?= $play->has('user') ? $this->Html->link($play->user->name, ['controller' => 'Users', 'action' => 'view', $play->user->id]) : '' ?></td>
+                        <td><?= h($play->created) ?></td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
     <div class="paginator">
         <ul class="pagination">
-            <?= $this->Paginator->first('<< ' . __('first')) ?>
-            <?= $this->Paginator->prev('< ' . __('previous')) ?>
+            <?= $this->Paginator->first('<< ' . __('primeiro')) ?>
+            <?= $this->Paginator->prev('< ' . __('anterior')) ?>
             <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('next') . ' >') ?>
-            <?= $this->Paginator->last(__('last') . ' >>') ?>
+            <?= $this->Paginator->next(__('próximo') . ' >') ?>
+            <?= $this->Paginator->last(__('último') . ' >>') ?>
         </ul>
-        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
+        <p><?= $this->Paginator->counter(__('Página {{page}} de {{pages}}, exibindo {{current}} registro(s) de {{count}} total')) ?></p>
     </div>
 </div>

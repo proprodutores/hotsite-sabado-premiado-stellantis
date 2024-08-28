@@ -21,12 +21,42 @@ class PlayController extends AppController
      */
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['Awards', 'Users'],
-        ];
-        $play = $this->paginate($this->Play);
+        if ($this->request->is('post')) {
+            $sweepstake_id = $this->request->getData('sweepstake_id');
+            $user_id = $this->request->getData('user_id');
+            $start_date = $this->request->getData('start_date');
+            $end_date = $this->request->getData('end_date');
 
-        $this->set(compact('play'));
+            $query = $this->Play->find()
+                    ->contain(['Awards' => ['Sweepstakes'], 'Users']);
+                if ($sweepstake_id) {
+                    $query->where(['Sweepstakes.id' => $sweepstake_id]);
+                }
+                if ($user_id) {
+                    $query->where(['user_id ' => $user_id]);
+                }
+                if ($start_date) {
+                    $query->where(['Play.created >= ' => $start_date]);
+                }
+                if ($end_date) {
+                    $query->where(['Play.created <= ' => $end_date]);
+                }
+
+                $play = $this->paginate($query);
+        }
+        else{
+            $this->paginate = [
+                'contain' => ['Awards' => ['Sweepstakes'], 'Users'],
+                'order' => ['Play.id']
+            ];
+            $play = $this->paginate($this->Play);
+
+        }
+
+        $users = $this->Play->Users->find('list')->where(['type' => 'Restaurante' ]);
+        $sweepstakes = $this->fetchTable('Sweepstakes')->find('list')->all();
+
+        $this->set(compact('play', 'users', 'sweepstakes'));
     }
 
     /**

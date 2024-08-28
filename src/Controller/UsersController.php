@@ -118,7 +118,7 @@ class UsersController extends AppController
             return $this->redirect(['controller' => 'Sweepstakes', 'action' => 'index']);
         }
         if ($this->request->is('post')) {
-            $this->Flash->error('Invalid username or password');
+            $this->Flash->error('Usuário ou senha inválidos.');
         }
     }
 

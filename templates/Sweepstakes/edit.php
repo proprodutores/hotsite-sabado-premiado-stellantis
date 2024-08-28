@@ -25,7 +25,7 @@
                     echo $this->Form->control('description', ['label' => 'Descrição']);
                     echo $this->Form->control('date_start', ['empty' => true, 'label' => 'Início']);
                     echo $this->Form->control('date_end', ['empty' => true, 'label' => 'Fim']);
-                    echo $this->Form->control('difficulty', ['label' => 'Fator de dificuldade']);
+                    echo $this->Form->control('difficulty', ['label' => 'Probabilidade de acerto (%)']);
                     echo $this->Form->control('spaces', ['label' => 'Qtde de espaços na roleta']);
                     echo $this->Form->control('active', ['label' => 'Ativo', 'type' => 'checkbox']);
                 ?>

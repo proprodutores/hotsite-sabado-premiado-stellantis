@@ -62,7 +62,8 @@ class PagesController extends AppController
         $this->set(compact('page', 'subpage'));
 
         try {
-            return $this->render(implode('/', $path));
+            // return $this->render(implode('/', $path));
+            return $this->redirect(['controller' => 'Sweepstakes', 'action' => 'index']);
         } catch (MissingTemplateException $exception) {
             if (Configure::read('debug')) {
                 throw $exception;

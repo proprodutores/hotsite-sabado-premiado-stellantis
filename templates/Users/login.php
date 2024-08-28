@@ -1,7 +1,9 @@
 <style>
     .container {
         display: flex;
+        flex-direction: column;
         justify-content: center;
+        align-items: center;
     }
     .content {
         width: 50%;
