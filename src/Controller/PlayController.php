@@ -41,7 +41,7 @@ class PlayController extends AppController
                 if ($end_date) {
                     $query->where(['Play.created <= ' => $end_date]);
                 }
-
+                $query->order(['Play.id']);
                 $play = $this->paginate($query);
         }
         else{
