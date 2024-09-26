@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Datasource\ConnectionManager;
 use Cake\View\JsonView;
 
 /**
@@ -21,19 +22,45 @@ class PlayController extends AppController
      */
     public function index()
     {
-        if ($this->request->is('post')) {
-            $sweepstake_id = $this->request->getData('sweepstake_id');
-            $user_id = $this->request->getData('user_id');
-            $start_date = $this->request->getData('start_date');
-            $end_date = $this->request->getData('end_date');
+        $summary = "";
+        $sweepstake_name = "";
+
+        if ($this->request->is('get')) {
+            $sweepstake_id = $this->request->getQuery('sweepstake_id');
+            $award = $this->request->getQuery('award');
+            $user_id = $this->request->getQuery('user_id');
+            $start_date = $this->request->getQuery('start_date');
+            $end_date = $this->request->getQuery('end_date');
 
             $query = $this->Play->find()
                     ->contain(['Awards' => ['Sweepstakes'], 'Users']);
                 if ($sweepstake_id) {
-                    $query->where(['Sweepstakes.id' => $sweepstake_id]);
+                    $sweepstake = $this->fetchTable('Sweepstakes')->find()->where(['id' => $sweepstake_id])->first();
+                    $sweepstake_name = $sweepstake->description;
+
+                    $query->where(['Play.created >= ' => $sweepstake->date_start]);
+                    $query->where(['Play.created <= ' => $query->func()->dateAdd("'".$sweepstake->date_end->format("Y-m-d H:i")."'", 1, "MINUTE")]);
+
+                    $connection = ConnectionManager::get('default');
+                    $query_summary = "SELECT u.name, 
+                            (SELECT count(*) FROM play p1 WHERE user_id = u.id AND created >= '".$sweepstake->date_start->format("Y-m-d H:i")."' AND created <= DATE_ADD('".$sweepstake->date_end->format("Y-m-d H:i")."', INTERVAL 1 MINUTE)) as val1,
+                            (SELECT count(*) FROM play p1 WHERE user_id = u.id AND award_id IS NOT NULL && created >= '".$sweepstake->date_start->format("Y-m-d H:i")."' AND created <= DATE_ADD('".$sweepstake->date_end->format("Y-m-d H:i")."', INTERVAL 1 MINUTE)) as val2
+                            FROM play p
+                            INNER JOIN users u ON u.id = p.user_id
+                            WHERE p.created >= '".$sweepstake->date_start->format("Y-m-d H:i")."' AND p.created <= DATE_ADD('".$sweepstake->date_end->format("Y-m-d H:i")."', INTERVAL 1 MINUTE)
+                            GROUP BY u.name";
+                    $statement = $connection->prepare($query_summary);
+                    $statement->execute();
+                    $count = $statement->columnCount();
+                    if ($count > 0)
+                        $summary = $statement->fetchAll('assoc');
+
                 }
                 if ($user_id) {
                     $query->where(['user_id ' => $user_id]);
+                }
+                if ($award) {
+                    $query->where(['award_id IS NOT ' => null]);
                 }
                 if ($start_date) {
                     $query->where(['Play.created >= ' => $start_date]);
@@ -53,10 +80,12 @@ class PlayController extends AppController
 
         }
 
+        
+
         $users = $this->Play->Users->find('list')->where(['type' => 'Restaurante' ]);
         $sweepstakes = $this->fetchTable('Sweepstakes')->find('list')->all();
 
-        $this->set(compact('play', 'users', 'sweepstakes'));
+        $this->set(compact('play', 'users', 'sweepstakes', 'summary', 'sweepstake_name'));
     }
 
     /**
