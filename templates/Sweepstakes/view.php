@@ -31,7 +31,7 @@
                     <td><?= h($sweepstake->date_end) ?></td>
                 </tr>
                 <tr>
-                    <th><?= __('Fator de doficuldade') ?></th>
+                    <th><?= __('Probabilidade de acerto (%)') ?></th>
                     <td><?= h($sweepstake->difficulty) ?></td>
                 </tr>
                 <tr>
@@ -53,7 +53,7 @@
                             <th><?= __('Nome') ?></th>
                             <th><?= __('Quantidade') ?></th>
                             <th><?= __('Saldo') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
+                            <th class="actions"><?= __('Ações') ?></th>
                         </tr>
                         <?php foreach ($sweepstake->awards as $awards) : ?>
                         <tr>
